@@ -10,8 +10,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@rbxts/abstractify": "^1.0.0",
     "@rbxts/compiler-types": "^1.0.0-types.0",
+    "@rbxts/services": "^1.1.4",
     "@rbxts/types": "^1.0.479",
+    "rbxts-transform-debug": "^0.4.0",
+    "rbxts-transformer-services": "^1.0.0",
     "ts-standard": "^10.0.0"
   }
 }
