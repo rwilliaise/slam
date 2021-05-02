@@ -1,0 +1,20 @@
+{
+  "name": "slam",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ts-standard && rbxtsc -p test.tsconfig.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rbxts/compiler-types": "^1.0.0-types.0",
+    "@rbxts/types": "^1.0.479",
+    "ts-standard": "^10.0.0"
+  },
+  "ts-standard": {
+    "project": "./tsconfig.json"
+  }
+}
