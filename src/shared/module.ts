@@ -1,4 +1,3 @@
-export function makeHello(name: string) {
-  return `Hello from ${name}!`;
+export function makeHello (name: string): string {
+  return `Hello from ${name}!`
 }
-

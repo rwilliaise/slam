@@ -13,8 +13,5 @@
     "@rbxts/compiler-types": "^1.0.0-types.0",
     "@rbxts/types": "^1.0.479",
     "ts-standard": "^10.0.0"
-  },
-  "ts-standard": {
-    "project": "./tsconfig.json"
   }
 }
