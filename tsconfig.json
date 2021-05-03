@@ -13,17 +13,19 @@
     "strict": true,
     "target": "ESNext",
     "typeRoots": [
-      "node_modules/@rbxts"
+      "node_modules/@rbxts",
+      "node_modules/rbxts-transform-debug/index"
     ],
     // configurable
     "rootDir": "src",
     "outDir": "out",
     "baseUrl": "src",
-    "incremental": true,
-    "tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
+    // "incremental": true,
+    // "tsBuildInfoFile": "out/tsconfig.tsbuildinfo",
     "plugins": [
       {
-        "transform": "rbxts-transform-debug" 
+        "transform": "rbxts-transform-debug",
+        "enabled": true
       },
       {
         "transform": "rbxts-transformer-services" 

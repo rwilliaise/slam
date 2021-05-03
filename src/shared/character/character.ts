@@ -1,5 +1,7 @@
 import { ContextActionService } from '@rbxts/services'
-import { isClient } from 'shared/utils'
+import { isClient, isServer } from 'shared/utils'
+import { $print } from 'rbxts-transform-debug'
+import { ipcClient, ipcServer } from '@rbxts/abstractify'
 
 /**
  * A move that a character can do.
@@ -7,6 +9,7 @@ import { isClient } from 'shared/utils'
 interface Move {
   callback?: Callback
   cooldown?: number
+  predicted: boolean
 }
 
 export class Character {
@@ -19,14 +22,40 @@ export class Character {
    */
   constructor (public player: Player) {
     this.pollEvents()
-  }
-
-  pollInputs (name: string, state: Enum.UserInputState, inputObject: InputObject): void {
-
+    if (isServer()) {
+      ipcServer.on('moveInput', (player: Player, name, state) => {
+        if (player === this.player) {
+          let move: Move | undefined
+          if ((move = this.moveMap.get(name)) !== undefined && move.callback !== undefined) {
+            move.callback(state)
+          }
+        }
+      })
+        .catch((err) => { $print(err) })
+    }
   }
 
   /**
-   *
+   * Handles input for all moves.
+   * @param name Id of the move
+   * @param state State of the move fired
+   * @param inputObject InputObject relating to the move input
+   * @client
+   */
+  pollInputs (name: string, state: Enum.UserInputState, inputObject: InputObject): void {
+    let move: Move | undefined
+    if ((move = this.moveMap.get(name)) !== undefined && move.callback !== undefined) {
+      if (move.predicted) {
+        ipcClient.emit('moveInput', name, state).catch((err) => { $print(err) })
+      }
+      move.callback(state, inputObject)
+      return
+    }
+    $print(`Move or move callback with move id ${name} does not exist!`)
+  }
+
+  /**
+   * Binds events to the player.
    */
   pollEvents (): void {
     this.player.CharacterAdded.Connect((character: Model) => this.onCharacterAdded(character))
@@ -49,7 +78,7 @@ export class Character {
    */
   registerMove (...keyCodes: Enum.KeyCode[]): Move {
     const id = tostring(this.moveId++)
-    const move: Move = { }
+    const move: Move = { predicted: true } // predict all moves by default
     this.moveMap.set(id, move)
     if (isClient()) {
       ContextActionService.BindAction(id, (name, state, obj) => this.pollInputs(name, state, obj), false, ...keyCodes)

@@ -1,3 +1,6 @@
-import { makeHello } from 'shared/module'
+import { Players, RunService } from '@rbxts/services'
+import { DummyCharacter } from 'shared/character/dummy'
 
-print(makeHello('main.client.ts'))
+const char = new DummyCharacter(Players.LocalPlayer)
+
+RunService.Heartbeat.Connect((delta) => char.think(delta))
