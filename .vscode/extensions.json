@@ -1,5 +1,6 @@
 {
   "recommendations": [
-    "standard.vscode-standard"
+    "standard.vscode-standard",
+    "evaera.vscode-rojo"
   ]
 }
