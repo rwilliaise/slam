@@ -6,20 +6,20 @@
   "scripts": {
     "test": "ts-standard && rbxtsc -p test.tsconfig.json",
     "build": "rbxtsc",
-    "build:dev": "cross-env T=development rbxtsc",
-    "package": "rojo build -o slam.rbxlx",
+    "build:dev": "rbxtsc -p dev.tsconfig.json",
+    "pack": "rojo build -o slam.rbxlx",
     "publish-rbx": "",
-    "watch": "cross-env T=development rbxtsc -w"
+    "watch": "rbxtsc -w -p dev.tsconfig.json"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "GPLv3",
   "devDependencies": {
     "@rbxts/abstractify": "^1.1.2",
     "@rbxts/compiler-types": "^1.0.0-types.0",
+    "@rbxts/roact": "*",
     "@rbxts/services": "^1.1.4",
     "@rbxts/types": "^1.0.479",
-    "cross-env": "^7.0.3",
     "rbxts-transform-debug": "^0.4.0",
     "rbxts-transformer-services": "^1.0.0",
     "ts-standard": "^10.0.0"

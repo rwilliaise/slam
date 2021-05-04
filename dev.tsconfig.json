@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "transform": "rbxts-transform-debug",
+        "enabled": true
+      }
+    ]
+  }
+}

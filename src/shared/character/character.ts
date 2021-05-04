@@ -12,6 +12,9 @@ interface Move {
   predicted: boolean
 }
 
+/**
+ * A playable character. All code is present on both sides for easy prediction.
+ */
 export class Character {
   private readonly moveMap: Map<string, Move> = new Map()
   private moveId: number = 0
@@ -22,6 +25,8 @@ export class Character {
    */
   constructor (public player: Player) {
     this.pollEvents()
+    // all inputs are captured and run on both sides, ensuring massive ping doesn't ruin a match
+    // TODO: lag compensation - there should be lag comp for both melee and ranged attacks, but that will be difficult
     if (isServer()) {
       ipcServer.on('moveInput', (player: Player, name, state) => {
         if (player === this.player) {

@@ -1,6 +1,5 @@
-import { Players, RunService } from '@rbxts/services'
-import { DummyCharacter } from 'shared/character/dummy'
+import { $warn } from 'rbxts-transform-debug'
+import mount from './ui'
 
-const char = new DummyCharacter(Players.LocalPlayer)
-
-RunService.Heartbeat.Connect((delta) => char.think(delta))
+mount()
+  .catch((err) => { $warn(err) })
