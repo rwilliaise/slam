@@ -6,8 +6,8 @@ A fighting game that is supposedly ultra moddable. The entire codebase is in Typ
 
 ### Prerequsites
 
-- npm (>=6.0.0) at [nodejs.org]
-- rojo (>=6.0.0)
+- npm (>=6.0.0) at [nodejs.org](https://nodejs.org)
+- rojo (>=6.0.0) at [crates.io](https://crates.io/crates/rojo), [rojo.space](https://rojo.space), or [VSCode extension](https://marketplace.visualstudio.com/items?itemName=evaera.vscode-rojo)
 
 ### Build
 
