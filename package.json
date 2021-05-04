@@ -8,6 +8,9 @@
     "build": "rbxtsc",
     "build:dev": "rbxtsc -p dev.tsconfig.json",
     "pack": "rojo build -o slam.rbxlx",
+    "pack:dev": "rojo build -o slam-dev.rbxlx",
+    "make": "npm run build && npm run pack",
+    "make:dev": "npm run build:dev && npm run pack:dev",
     "publish-rbx": "",
     "watch": "rbxtsc -w -p dev.tsconfig.json"
   },
@@ -22,6 +25,7 @@
     "@rbxts/types": "^1.0.479",
     "rbxts-transform-debug": "^0.4.0",
     "rbxts-transformer-services": "^1.0.0",
+    "roblox-ts": "^1.1.1",
     "ts-standard": "^10.0.0"
   }
 }
