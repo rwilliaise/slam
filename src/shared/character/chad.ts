@@ -1,6 +1,6 @@
-import { $dbg, $warn } from 'rbxts-transform-debug'
+import { $dbg } from 'rbxts-transform-debug'
 import { tryMelee } from 'shared/hitreg'
-import { isServer } from 'shared/utils'
+import { isServer, promiseError } from 'shared/utils'
 import { Character } from './character'
 
 /** Punch-based character. */
@@ -32,9 +32,7 @@ export class ChadCharacter extends Character {
       .GetMarkerReachedSignal('RegisterHit')
       .Connect(() => {
         this.registerHit()
-          .catch((err) => {
-            $warn(`Hitreg error: ${tostring(err)}`)
-          })
+          .catch(promiseError)
       })
   }
 

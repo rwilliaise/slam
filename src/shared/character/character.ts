@@ -1,5 +1,5 @@
 import { ContextActionService } from '@rbxts/services'
-import { isClient, isServer } from 'shared/utils'
+import { isClient, isServer, promiseError } from 'shared/utils'
 import { $print } from 'rbxts-transform-debug'
 import { ipcClient, ipcServer } from '@rbxts/abstractify'
 
@@ -28,7 +28,7 @@ export class Character {
    * @param player Player to bind to
    */
   constructor (public player: Player) {
-    this.pollEvents()
+    // this.pollEvents()
     // all inputs are captured and run on both sides, ensuring massive ping doesn't ruin a match
     // TODO: lag compensation - there should be lag comp for both melee and ranged attacks, but that will be difficult
     if (isServer()) {
@@ -81,9 +81,9 @@ export class Character {
         return
       }
       if (move.predicted) {
-        ipcClient.emit('moveInput', name, state).catch((err) => { $print(err) })
+        ipcClient.emit('moveInput', name, state).catch(promiseError)
       }
-      debug.profilebegin('NetPredict')
+      debug.profilebegin('NetPredict') // prediction profile
       move.callback(state, inputObject)
       debug.profileend()
       return
@@ -96,6 +96,9 @@ export class Character {
    */
   pollEvents (): void {
     this.player.CharacterAdded.Connect((character: Model) => this.onCharacterAdded(character))
+    if (this.player.Character !== undefined) {
+      this.onCharacterAdded(this.player.Character)
+    }
   }
 
   /**

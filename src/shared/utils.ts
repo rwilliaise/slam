@@ -23,3 +23,7 @@ export function warnThread (): void {
   $warn('An error will be thrown - this could possibly interrupt the main coroutine. Make sure this is checked!')
   $warn(`Is main thread: ${checkThread() ? 'yes' : 'no'}`)
 }
+
+export function promiseError (err: any): void {
+  $warn(`Handled promise error: ${tostring(err)}`)
+}
