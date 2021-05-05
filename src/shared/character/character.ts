@@ -19,6 +19,8 @@ interface Move {
  */
 export class Character {
   private readonly moveMap: Map<string, Move> = new Map()
+  // TODO: potential memory overhead
+  private readonly cooldownMap: Map<string, number> = new Map()
   private moveId: number = 0
 
   /**
@@ -30,8 +32,12 @@ export class Character {
     // all inputs are captured and run on both sides, ensuring massive ping doesn't ruin a match
     // TODO: lag compensation - there should be lag comp for both melee and ranged attacks, but that will be difficult
     if (isServer()) {
-      ipcServer.on('moveInput', (player: Player, name, state) => {
+      ipcServer.on('moveInput', (player: Player, name: string, state) => {
         if (player === this.player) {
+          if (this.getCooldown(name, state)) {
+            $print(`Move with id: ${name} is on cooldown. Please wait!`)
+            return
+          }
           let move: Move | undefined
           if ((move = this.moveMap.get(name)) !== undefined && move.callback !== undefined) {
             move.callback(state)
@@ -40,6 +46,24 @@ export class Character {
       })
         .catch((err) => { $print(err) })
     }
+  }
+
+  /**
+   * Get if a move can be executed. Cooldown is on a input state basis, which might be a vulnerability. Stay frosty.
+   * @param name Name/id of the move
+   * @returns True if the move is on cooldown.
+   */
+  getCooldown (name: string, state: Enum.UserInputState): boolean {
+    let move: Move | undefined
+    if ((move = this.moveMap.get(name)) !== undefined && move.cooldown !== undefined) {
+      const cooldownTime = this.cooldownMap.get(name + state.Name)
+      if (cooldownTime !== undefined && cooldownTime >= tick()) {
+        return true
+      }
+      this.cooldownMap.set(name + state.Name, tick() + move.cooldown)
+      return false
+    }
+    return false
   }
 
   /**
@@ -52,10 +76,16 @@ export class Character {
   pollInputs (name: string, state: Enum.UserInputState, inputObject: InputObject): void {
     let move: Move | undefined
     if ((move = this.moveMap.get(name)) !== undefined && move.callback !== undefined) {
+      if (this.getCooldown(name, state)) {
+        $print(`Move with id: ${name} is on cooldown. Please wait!`)
+        return
+      }
       if (move.predicted) {
         ipcClient.emit('moveInput', name, state).catch((err) => { $print(err) })
       }
+      debug.profilebegin('NetPredict')
       move.callback(state, inputObject)
+      debug.profileend()
       return
     }
     $print(`Move or move callback with move id ${name} does not exist!`)

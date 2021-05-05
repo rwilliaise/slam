@@ -12,7 +12,7 @@
     "make": "npm run build && npm run pack",
     "make:dev": "npm run build:dev && npm run pack:dev",
     "publish-rbx": "",
-    "watch": "rbxtsc -w -p dev.tsconfig.json"
+    "watch": "rbxtsc -w --verbose -p dev.tsconfig.json"
   },
   "keywords": [],
   "author": "",

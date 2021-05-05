@@ -1,4 +1,5 @@
 import RotatedRegion3 from '@rbxts/rotatedregion3'
+import { Players } from '@rbxts/services'
 import { warnThread } from 'shared/utils'
 import { HitOptions, HitResult } from './regtils'
 
@@ -39,5 +40,20 @@ export function tryMelee (cframe: CFrame, size: Vector3, options?: MeleeOptions)
     warnThread()
     error('Unexpected state: parts is undefined! This should be impossible!')
   }
-  return { hitAnything: !parts.isEmpty(), hitParts: parts }
+  let hitPlayer: Player | undefined
+  let hitHumanoid: Humanoid | undefined
+  for (const part of parts) {
+    if (hitPlayer === undefined) {
+      hitPlayer = Players.GetPlayerFromCharacter(part.Parent)
+    }
+    if (hitHumanoid === undefined) {
+      hitHumanoid = part.Parent?.FindFirstChild('Humanoid') as Humanoid | undefined
+    }
+  }
+  return {
+    hitAnything: !parts.isEmpty(),
+    hitParts: parts,
+    hitHumanoid: hitHumanoid,
+    hitPlayer: hitPlayer
+  }
 }

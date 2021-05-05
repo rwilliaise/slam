@@ -24,3 +24,6 @@ export interface HitOptions {
   /** A list of Instances (including their children) to ignore when casting. Mutally exclusive with `whitelist`. */
   blacklist?: Instance[]
 }
+
+/** Used to trick the compiler into not crashing at run-time. */
+export const Stabilizer = 1
