@@ -1,8 +1,8 @@
 import { Players, RunService } from '@rbxts/services'
-import { DummyCharacter } from 'shared/character/dummy'
+import { ChadCharacter } from 'shared/character/chad'
 
 function connectPlayer (player: Player): void {
-  const char = new DummyCharacter(player)
+  const char = new ChadCharacter(player)
   RunService.Heartbeat.Connect((delta) => char.think(delta))
 }
 

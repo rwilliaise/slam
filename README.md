@@ -23,7 +23,7 @@ To build a place file, run
 npm run make
 ```
 
-This should run the compiler and build a place file. The place file should be located within the root folder, called `slam.rbxlx`.
+This should run the compiler and build a place file with the codebase. The place file should be located within the root folder, called `slam.rbxlx`.
 If you do not have Rojo, please get it from [crates.io](https://crates.io/crates/rojo) or [rojo.space](https://rojo.space). You may also use the VSCode extension.
 
 ## Development Version

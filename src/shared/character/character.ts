@@ -3,11 +3,13 @@ import { isClient, isServer } from 'shared/utils'
 import { $print } from 'rbxts-transform-debug'
 import { ipcClient, ipcServer } from '@rbxts/abstractify'
 
+type ActionType = Enum.KeyCode | Enum.PlayerActions | Enum.UserInputType
+
 /**
  * A move that a character can do.
  */
 interface Move {
-  callback?: Callback
+  callback?: (state: Enum.UserInputState, inputObject?: InputObject) => unknown
   cooldown?: number
   predicted: boolean
 }
@@ -81,7 +83,7 @@ export class Character {
    * @param keyCodes Keycodes for the move to fire on (unused on server)
    * @returns The move for editing
    */
-  registerMove (...keyCodes: Enum.KeyCode[]): Move {
+  registerMove (...keyCodes: ActionType[]): Move {
     const id = tostring(this.moveId++)
     const move: Move = { predicted: true } // predict all moves by default
     this.moveMap.set(id, move)

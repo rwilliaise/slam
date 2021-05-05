@@ -10,8 +10,8 @@ export interface MeleeOptions extends HitOptions {
 
 /**
  * Attempts to calculate if players are inside a given hitbox. By default, the calculation will be a blacklist.
- * @param size Size of melee hitbox.
  * @param cframe CFrame of melee hitbox.
+ * @param size Size of melee hitbox.
  * @param options Options for the melee operation.
  */
 export function tryMelee (cframe: CFrame, size: Vector3, options?: MeleeOptions): HitResult {
@@ -24,7 +24,7 @@ export function tryMelee (cframe: CFrame, size: Vector3, options?: MeleeOptions)
   if (options?.whitelist === undefined) {
     const ignore: Instance[] = []
     if (options?.blacklist !== undefined) {
-      ignore.push(...options.blacklist)
+      options.blacklist.forEach((value) => ignore.push(value))
     }
     // ignore player if given
     if (options?.ignorePlayer !== undefined && options.ignorePlayer.Character !== undefined) {
