@@ -35,11 +35,23 @@ export function CharacterSelection (): Roact.Element {
       Size={UDim2.fromScale(0.75, 0.75)}
       AnchorPoint={new Vector2(0.5, 0.5)}
       Position={UDim2.fromScale(0.5, 0.5)}
+      BackgroundColor={new BrickColor('Really black')}
+      BackgroundTransparency={0.7}
     >
-      <uigridlayout Key='Layout' />
-      {
-        getCharacterButtons()
-      }
+      <uicorner CornerRadius={new UDim(0, 5)} />
+      <uistroke Enabled />
+      <frame
+        Key='Content'
+        Size={new UDim2(1, -10, 1, -10)}
+        AnchorPoint={new Vector2(0.5, 0.5)}
+        Position={UDim2.fromScale(0.5, 0.5)}
+        BackgroundTransparency={1}
+      >
+        <uigridlayout Key='Layout' />
+        {
+          getCharacterButtons()
+        }
+      </frame>
     </frame>
   )
 }
