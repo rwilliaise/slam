@@ -11,25 +11,62 @@ const AlertContentStyles = {
 
 interface AlertProps { Text: string, ButtonText: string }
 
+/**
+ * A basic alert dialog. Cannot have much text.
+ *
+ * @example
+ * // pops up a dialog saying "Seems like your data got trolled!"
+ * <Alert Text='Seems like your data got trolled!' ButtonText='okay, whatever' />
+ *
+ * @todo Make a closed event visible
+ */
 export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
-  motor: Flipper.SingleMotor
+  closeMotor: Flipper.SingleMotor
   closeBinding: Roact.Binding<number>
+
+  hoverMotor: Flipper.SingleMotor
+  hoverBinding: Roact.Binding<number>
 
   constructor (props: AlertProps) {
     super(props)
     this.setState({ Closed: false })
-    this.motor = new Flipper.SingleMotor(0)
-    const [closeBinding, setCloseBinding] = Roact.createBinding(this.motor.getValue())
+
+    // close motor
+    this.closeMotor = new Flipper.SingleMotor(0)
+
+    const [closeBinding, setCloseBinding] = Roact.createBinding(this.closeMotor.getValue())
     this.closeBinding = closeBinding
 
-    this.motor.onStep(setCloseBinding)
-    this.motor.onComplete(() => this.setState({ Closed: true }))
+    this.closeMotor.onStep(setCloseBinding)
+    this.closeMotor.onComplete(() => this.setState({ Closed: true })) // hide the component entirely when done
+
+    // hover motor
+    this.hoverMotor = new Flipper.SingleMotor(0)
+
+    const [hoverBinding, setHoverBinding] = Roact.createBinding(this.hoverMotor.getValue())
+    this.hoverBinding = hoverBinding
+
+    this.hoverMotor.onStep(setHoverBinding)
   }
 
   close: () => void = () => {
-    this.motor.setGoal(new Flipper.Spring(1, {
+    this.closeMotor.setGoal(new Flipper.Spring(1, {
       frequency: 5,
       dampingRatio: 1
+    }))
+  }
+
+  buttonHover: () => void = () => {
+    this.hoverMotor.setGoal(new Flipper.Spring(1, {
+      frequency: 5,
+      dampingRatio: 1
+    }))
+  }
+
+  buttonUnhover: () => void = () => {
+    this.hoverMotor.setGoal(new Flipper.Spring(0, {
+      frequency: 4,
+      dampingRatio: 0.75
     }))
   }
 
@@ -76,7 +113,7 @@ export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
           <textbutton
             Key='Button'
             Text={this.props.ButtonText.upper()}
-            Size={new UDim2(1, -30, 0.2, 0)}
+            Size={this.hoverBinding.map((value: number) => new UDim2(1, -30, 0.2, 0).Lerp(new UDim2(1, -25, 0.2, 5), value))}
             Position={new UDim2(0.5, 0, 0.8, 0)}
             AnchorPoint={new Vector2(0.5, 0.5)}
             BackgroundColor3={new Color3(1, 1, 1)}
@@ -87,7 +124,7 @@ export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
             BackgroundTransparency={this.closeBinding.map((value: number) => value)}
             TextColor3={new Color3()}
             AutoButtonColor={false}
-            Event={{ Activated: this.close }}
+            Event={{ Activated: this.close, MouseEnter: this.buttonHover, MouseLeave: this.buttonUnhover }}
           >
             <uicorner Key='Corner' CornerRadius={new UDim(0, 5)} />
           </textbutton>
