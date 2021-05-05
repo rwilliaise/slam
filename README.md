@@ -1,6 +1,6 @@
 # SLAM
 
-A fighting game that is supposedly ultra moddable. The entire codebase is in TypeScript for ease of use purposes. All other code is in lua due to limitations within roblox-ts.
+A fighting game. The entire codebase is in TypeScript for ease of use purposes. All other code is in lua due to limitations within roblox-ts.
 
 ## Building And Running
 
