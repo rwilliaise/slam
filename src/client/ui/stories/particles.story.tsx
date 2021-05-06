@@ -1,0 +1,4 @@
+
+export = (target: Instance) => {
+
+}
