@@ -1,6 +1,6 @@
-import { $dbg } from 'rbxts-transform-debug'
+import { Workspace } from '@rbxts/services'
 import { tryMelee } from 'shared/hitreg'
-import { isServer, promiseError } from 'shared/utils'
+import { isClient, isServer, promiseError } from 'shared/utils'
 import { Character } from './character'
 
 /** Punch-based character. */
@@ -14,7 +14,7 @@ export class ChadCharacter extends Character {
     super(player)
     const punch = this.registerMove(Enum.UserInputType.MouseButton1)
     punch.callback = (state, obj) => this.tryPunch(state, obj)
-    punch.cooldown = 0.8 // 1 sec cooldown
+    punch.cooldown = 0.85 // 1 sec cooldown
     this.animation = new Instance('Animation')
     this.animation.AnimationId = 'rbxassetid://6053790188'
   }
@@ -44,10 +44,32 @@ export class ChadCharacter extends Character {
   }
 
   async registerHit (): Promise<void> {
-    const charCFrame = this.character?.GetPrimaryPartCFrame()
-    if (charCFrame !== undefined) {
+    const rootPart = this.character?.FindFirstChild('HumanoidRootPart') as BasePart | undefined
+    const charCFrame = rootPart?.CFrame
+    if (charCFrame !== undefined && rootPart !== undefined) {
+      if (isServer()) {
+        const compensatedCFrame = charCFrame.add(rootPart.AssemblyLinearVelocity.mul(0.5))
+        const part = new Instance('Part')
+        part.CFrame = compensatedCFrame.mul(new CFrame(0, 0, -2))
+        part.Size = new Vector3(4, 4, 4)
+        part.CanCollide = false
+        part.Anchored = true
+        part.BrickColor = new BrickColor('Bright blue')
+        part.Transparency = 0.5
+        part.Parent = Workspace
+      }
+      const part = new Instance('Part')
+      part.CFrame = charCFrame.mul(new CFrame(0, 0, -2))
+      part.Size = new Vector3(4, 4, 4)
+      part.CanCollide = false
+      part.Anchored = true
+      part.BrickColor = new BrickColor('Bright red')
+      if (isClient()) {
+        part.BrickColor = new BrickColor('Bright green')
+      }
+      part.Transparency = 0.5
+      part.Parent = Workspace
       const result = tryMelee(charCFrame.mul(new CFrame(0, 0, -2)), new Vector3(4, 4, 4), { ignorePlayer: this.player })
-      $dbg(result)
       if (result.hitHumanoid !== undefined) {
         result.hitHumanoid.TakeDamage(10) // TODO: damage system, different damage types for damage invulns and counters
       }

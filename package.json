@@ -18,9 +18,10 @@
   "author": "",
   "license": "GPLv3",
   "devDependencies": {
-    "@rbxts/abstractify": "^1.1.3",
+    "@rbxts/abstractify": "^1.1.5",
     "@rbxts/compiler-types": "^1.0.0-types.0",
     "@rbxts/flipper": "^2.0.0",
+    "@rbxts/lerp-functions": "^1.0.1",
     "@rbxts/roact": "*",
     "@rbxts/rotatedregion3": "^1.1.0",
     "@rbxts/services": "^1.1.4",

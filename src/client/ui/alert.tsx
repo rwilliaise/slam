@@ -70,9 +70,9 @@ export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
     }))
   }
 
-  render (): Roact.Element {
+  render (): Roact.Element | undefined {
     return this.state.Closed
-      ? (<></>)
+      ? undefined
       : (
         <frame
           Key='Alert'
@@ -88,7 +88,7 @@ export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
             Font={Enum.Font.GothamBlack}
             TextSize={24}
             Size={new UDim2(1, -30, 0.6, -30)}
-            TextTransparency={this.closeBinding.map((value: number) => value)}
+            TextTransparency={this.closeBinding}
             Position={UDim2.fromOffset(15, 15)}
             {...AlertContentStyles}
           />
@@ -98,7 +98,7 @@ export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
             Text={this.props.Text}
             TextSize={18}
             Size={new UDim2(1, -30, 0.5, -30)}
-            TextTransparency={this.closeBinding.map((value: number) => value)}
+            TextTransparency={this.closeBinding}
             Position={new UDim2(0, 15, 0.2, 15)}
             {...AlertContentStyles}
           />
@@ -107,7 +107,7 @@ export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
             Size={new UDim2(1, -30, 0, 1)}
             BorderSizePixel={0}
             Position={new UDim2(0, 15, 0.725, -15)}
-            BackgroundTransparency={this.closeBinding.map((value: number) => value)}
+            BackgroundTransparency={this.closeBinding}
             BackgroundColor3={new Color3(0.5, 0.5, 0.5)}
           />
           <textbutton
@@ -120,8 +120,8 @@ export class Alert extends PureComponent<AlertProps, { Closed: boolean }> {
             Font={Enum.Font.GothamBold}
             TextTruncate={Enum.TextTruncate.AtEnd}
             TextSize={24}
-            TextTransparency={this.closeBinding.map((value: number) => value)}
-            BackgroundTransparency={this.closeBinding.map((value: number) => value)}
+            TextTransparency={this.closeBinding}
+            BackgroundTransparency={this.closeBinding}
             TextColor3={new Color3()}
             AutoButtonColor={false}
             Event={{ Activated: this.close, MouseEnter: this.buttonHover, MouseLeave: this.buttonUnhover }}

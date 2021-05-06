@@ -80,12 +80,13 @@ export class Character {
         $print(`Move with id: ${name} is on cooldown. Please wait!`)
         return
       }
+      ipcClient.emit('moveInput', name, state).catch(promiseError)
       if (move.predicted) {
-        ipcClient.emit('moveInput', name, state).catch(promiseError)
+        $print('Predicting!')
+        debug.profilebegin('NetPredict') // prediction profile
+        move.callback(state, inputObject)
+        debug.profileend()
       }
-      debug.profilebegin('NetPredict') // prediction profile
-      move.callback(state, inputObject)
-      debug.profileend()
       return
     }
     $print(`Move or move callback with move id ${name} does not exist!`)
@@ -104,7 +105,9 @@ export class Character {
   /**
    * Called when the character is added.
    */
-  onCharacterAdded (character: Model): void {}
+  onCharacterAdded (character: Model): void {
+
+  }
 
   /**
    * Called every frame.
