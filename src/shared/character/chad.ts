@@ -47,6 +47,7 @@ export class ChadCharacter extends Character {
     const rootPart = this.character?.FindFirstChild('HumanoidRootPart') as BasePart | undefined
     const charCFrame = rootPart?.CFrame
     if (charCFrame !== undefined && rootPart !== undefined) {
+      // TODO: lag compensated instead of velocity compensation
       if (isServer()) {
         const compensatedCFrame = charCFrame.add(rootPart.AssemblyLinearVelocity.mul(0.5))
         const part = new Instance('Part')

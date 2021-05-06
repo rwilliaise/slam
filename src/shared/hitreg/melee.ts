@@ -20,7 +20,7 @@ export function tryMelee (cframe: CFrame, size: Vector3, options?: MeleeOptions)
     warnThread()
     error('Unexpected state: both whitelist and blacklist are defined!')
   }
-  const hbox = RotatedRegion3.Block(cframe, size)
+  const hbox = RotatedRegion3.Block(cframe, size) // TODO: install new ver of rr3 when the static callback bug is fixed
   let parts: Part[] | undefined
   if (options?.whitelist === undefined) {
     const ignore: Instance[] = []

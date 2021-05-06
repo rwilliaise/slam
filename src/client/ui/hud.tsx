@@ -25,7 +25,7 @@ export class Healthbar extends Roact.PureComponent<HealthbarProps> {
   }
 
   didUpdate (previousProps: HealthbarProps, previousState: {}): void {
-    // TODO: show health decrease
+    // TODO: show health decrease where the decrease will flash white and fade out, instead of a simple tween
     const health = (this.props.Health !== undefined ? this.props.Health : 100)
     this.motor.setGoal(new Flipper.Spring(health / 100, {
       frequency: 6,
@@ -61,6 +61,7 @@ export class Healthbar extends Roact.PureComponent<HealthbarProps> {
   }
 }
 
+// TODO: cooldown bars
 export class HudScreen extends Roact.PureComponent<{}, { Health: number }> {
   constructor () {
     super({})

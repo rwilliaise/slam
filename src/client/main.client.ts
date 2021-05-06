@@ -8,3 +8,5 @@ chad.pollEvents()
 
 mount()
   .catch(promiseError)
+
+// TODO: !! IMPORTANT !! find feasible place to put the time syncing.

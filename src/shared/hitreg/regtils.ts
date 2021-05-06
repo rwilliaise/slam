@@ -25,5 +25,6 @@ export interface HitOptions {
   blacklist?: Instance[]
 }
 
+// FIXME: find another way to fix this crash, possibly put lag comp stuff in here
 /** Used to trick the compiler into not crashing at run-time. */
 export const Stabilizer = 1

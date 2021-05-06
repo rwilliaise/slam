@@ -18,8 +18,9 @@ interface Move {
  * A playable character. All code is present on both sides for easy prediction.
  */
 export class Character {
+  // FIXME: potential memory overhead, ideally moveMap should be static
   private readonly moveMap: Map<string, Move> = new Map()
-  // TODO: potential memory overhead
+  // FIXME: another potential memory overhead, 64 bit numbers are intensive
   private readonly cooldownMap: Map<string, number> = new Map()
   private moveId: number = 0
 
@@ -29,7 +30,7 @@ export class Character {
    */
   constructor (public player: Player) {
     // this.pollEvents()
-    // all inputs are captured and run on both sides, ensuring massive ping doesn't ruin a match
+    // all inputs are captured and run on both sides, making high ping feel less
     // TODO: lag compensation - there should be lag comp for both melee and ranged attacks, but that will be difficult
     if (isServer()) {
       ipcServer.on('moveInput', (player: Player, name: string, state) => {
@@ -60,6 +61,8 @@ export class Character {
       if (cooldownTime !== undefined && cooldownTime >= tick()) {
         return true
       }
+      // FIXME: cooldowns with this system are inaccurate and buggy
+      // this SHOULD use the synced time, and keep track with the server
       this.cooldownMap.set(name + state.Name, tick() + move.cooldown)
       return false
     }

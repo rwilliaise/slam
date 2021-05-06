@@ -12,6 +12,7 @@ function pressed (name: string): () => void {
 function CharacterButton (props: { Name: string }): Roact.Element {
   return (
     // TODO: make actual character icons
+    // TODO: better design for this tab
     <textbutton
       Text={props.Name}
       Key={props.Name}
