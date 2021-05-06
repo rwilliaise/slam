@@ -6,8 +6,8 @@ interface Limb {
 
 /** A snapshot in time containing all the players and their positions */
 export interface SnapshotItem {
-  /** A 2d array where each array inside is a player and their limbs */
-  players: Limb[][]
+  /** An array of players and their limbs, mapped by name */
+  players: Array<Map<string, Limb>>
   markedTime: number
 }
 
@@ -24,34 +24,33 @@ export class LagCompensation {
 
   // }
 
-  /** Get an item from the stack closest to the time given */
-  getSnapshot (time: number): SnapshotItem | undefined {
-    let smallestItem: SnapshotItem | undefined
-    let found = false
-    /*
-     loop through the stack, and see which item is less than time
-     as an example, if we had a snapshot at time 1 and time 2, and someone requested a time at 1.5, we should return
-     time 1
-     */
-    for (let i = 0; i < this.stack.size(); i++) {
-      const stackItem = this.stack[i]
-      if (stackItem.markedTime > time) {
-        smallestItem = stackItem
-      } else { // if it is less than time
-        if (i === 0) { // unlikely edge-case
-          smallestItem = stackItem
-        }
-        found = true
-        break
+  /** Get items from the stack closest to the time given. Returns multiple for interp. May return <2 */
+  getSnapshots (time: number): SnapshotItem[] {
+    const out: SnapshotItem[] = []
+    let closestTime: number = math.huge
+    let smallestItem: number | undefined
+    const sortedStack = this.stack.sort((a, b) => a.markedTime < b.markedTime)
+    // first, get the snapshot closest to the time given
+    for (let i = 0; i < sortedStack.size(); i++) {
+      const item = sortedStack[i]
+      if (math.abs(item.markedTime - time) < closestTime) {
+        smallestItem = i
+        closestTime = math.abs(item.markedTime - time)
       }
     }
-    if (found) { // definite the smallest item
-      return smallestItem
-    } else if (smallestItem !== undefined) { // we finished w/o
-      if (smallestItem.markedTime - time > 0.1) { // this is wayy out of range
-
-      }
+    if (smallestItem === undefined) { // the snapshot stack is empty, and we can't find any times smaller than math.huge
+      return out
     }
+    out.push(sortedStack[smallestItem])
+    // closest is behind time
+    if (closestTime < time && sortedStack.size() < smallestItem + 1) {
+      out.push(sortedStack[smallestItem + 1])
+    } else if (closestTime > time && smallestItem - 1 >= 0) { // closest is after time
+      out.push(sortedStack[smallestItem - 1])
+    } else {
+      // this is ignored, and should be accounted for when using getSnapshots
+    }
+    return out
   }
 
   /**
