@@ -34,6 +34,7 @@ export interface SnapshotItem {
 let stack: SnapshotItem[] = []
 let deltaCombined: number = 0
 
+/** Call this every frame. It will automatically handle the configuration. */
 export function update (delta: number): void {
   if ((deltaCombined += delta) >= LAG_COMP_RESOLUTION) {
     deltaCombined = 0
