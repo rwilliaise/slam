@@ -14,6 +14,9 @@
  *    that, and it'll start lagging.
  */
 
+import { Players } from '@rbxts/services'
+import { LAG_COMP_MEMORY_SECONDS, LAG_COMP_MEMORY_SIZE, LAG_COMP_RESOLUTION } from 'shared/hitreg'
+
 /** A players limb. Should reconstruct the original limb with as little data we can give. */
 interface Limb {
   // FIXME: don't use cframe, its 2x bigger than storing position and rotation manually
@@ -28,16 +31,43 @@ export interface SnapshotItem {
   markedTime: number
 }
 
-const stack: SnapshotItem[] = []
+let stack: SnapshotItem[] = []
+let deltaCombined: number = 0
 
-export function update (): void {
-  // TODO: add continual snapshotting
+export function update (delta: number): void {
+  if ((deltaCombined += delta) >= LAG_COMP_RESOLUTION) {
+    deltaCombined = 0
+    snapshot()
+  }
 }
 
-// TODO: create addStackItem
-// addStackItem (snapshot): void {
+/** Prunes the stack of any old snapshots. */
+export function prune (): void {
+  const currentTime = tick()
+  stack = stack.filter((value, index) => currentTime - value.markedTime < LAG_COMP_MEMORY_SECONDS && index < LAG_COMP_MEMORY_SIZE)
+}
 
-// }
+/** Takes a snapshot of all characters and adds it to the stack */
+export function snapshot (): void {
+  prune()
+  const outPlayers = new Map<string, Map<string, Limb>>()
+  for (const player of Players.GetPlayers()) {
+    if (player.Character !== undefined) {
+      outPlayers.set(player.Name, fromCharacter(player.Character))
+    }
+  }
+  stack.insert(0, { players: outPlayers, markedTime: tick() })
+}
+
+export function fromCharacter (character: Model): Map<string, Limb> {
+  const out = new Map<string, Limb>()
+  for (const limb of character.GetChildren()) {
+    if (limb.IsA('BasePart')) {
+      out.set(limb.Name, { size: limb.Size, cframe: limb.CFrame })
+    }
+  }
+  return out
+}
 
 /** Get items from the stack closest to the time given. Returns multiple for interp. Returns <=2 snapshots */
 export function getSnapshots (time: number): SnapshotItem[] {
@@ -87,13 +117,16 @@ export function remapSnapshots (snapshots: SnapshotItem[], time: number): number
   }
 
   let largestTime = snapshots[1] // guess that last element is largest
+  let smallestTime = snapshots[0]
 
-  if (largestTime.markedTime < snapshots[0].markedTime) {
-    largestTime = snapshots[0]
+  if (largestTime.markedTime < smallestTime.markedTime) {
+    largestTime = smallestTime
+    smallestTime = snapshots[1]
   }
 
-  // TODO: create remapping
-  return 1
+  const difference = largestTime.markedTime - smallestTime.markedTime // the time between the snapshots
+  const between = largestTime.markedTime - time // from the largest time to the smallest
+  return between / difference
 }
 
 export function interpolateLimbs (start: Map<string, Limb>, goal: Map<string, Limb>, alpha: number): Limb[] {
@@ -112,6 +145,13 @@ export function interpolateLimbs (start: Map<string, Limb>, goal: Map<string, Li
 
 export function reconstruct (limbs: Limb[]): Part[] {
   const out: Part[] = []
+  limbs.forEach((limb) => {
+    const limbOut = new Instance('Part')
+    limbOut.Anchored = true
+    limbOut.CFrame = limb.cframe
+    limbOut.Size = limb.size
+    out.push(limbOut)
+  })
   return out
 }
 
@@ -121,7 +161,6 @@ export function reconstruct (limbs: Limb[]): Part[] {
  * @param name The player name to find
  * @param time The time closest to find
  */
-// TODO: get WorldModel rotatedregion3s working, or another workaround
 export function getRecreatedPlayer (name: string, time: number): Model {
   const outModel = new Instance('Model')
   const snapshots = getSnapshots(time)

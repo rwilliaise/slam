@@ -1,3 +1,9 @@
+/** How much time should lag compensation remember. Adjust this if moves are frequently missing, but leave it low. */
+export const LAG_COMP_MEMORY_SECONDS = 1
+/** How many snapshots should lag compensation remember. Keep in mind that snapshots are expensive for memory. */
+export const LAG_COMP_MEMORY_SIZE = 15
+/** How many seconds between snapshots; in other words the resolution of lag compensation. Should be >=0.1 */
+export const LAG_COMP_RESOLUTION = 0.1
 
 /** Result of a hit */
 export interface HitResult {
@@ -24,7 +30,3 @@ export interface HitOptions {
   /** A list of Instances (including their children) to ignore when casting. Mutally exclusive with `whitelist`. */
   blacklist?: Instance[]
 }
-
-// FIXME: find another way to fix this crash, possibly put lag comp stuff in here
-/** Used to trick the compiler into not crashing at run-time. */
-export const Stabilizer = 1
