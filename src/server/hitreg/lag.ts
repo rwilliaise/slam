@@ -16,15 +16,15 @@
 
 /** A players limb. Should reconstruct the original limb with as little data we can give. */
 interface Limb {
+  // FIXME: don't use cframe, its 2x bigger than storing position and rotation manually
   cframe: CFrame
   size: Vector3
 }
 
 /** A snapshot in time containing all the players and their positions */
 export interface SnapshotItem {
-  // FIXME: less memory intensive maps
-  /** An map of player userids and their limbs, mapped by name */
-  players: Map<number, Map<string, Limb>>
+  /** An map of player usernames (not DisplayNames) and their limbs, mapped by name */
+  players: Map<string, Map<string, Limb>>
   markedTime: number
 }
 
@@ -86,6 +86,12 @@ export function remapSnapshots (snapshots: SnapshotItem[], time: number): number
     return 1
   }
 
+  let largestTime = snapshots[1] // guess that last element is largest
+
+  if (largestTime.markedTime < snapshots[0].markedTime) {
+    largestTime = snapshots[0]
+  }
+
   // TODO: create remapping
   return 1
 }
@@ -104,20 +110,45 @@ export function interpolateLimbs (start: Map<string, Limb>, goal: Map<string, Li
   return out
 }
 
+export function reconstruct (limbs: Limb[]): Part[] {
+  const out: Part[] = []
+  return out
+}
+
 /**
  * A recreated player out of parts at Time `time`. For use inside of a `WorldModel` for raycasting (& hopefully melee
  * stuff)
+ * @param name The player name to find
  * @param time The time closest to find
  */
 // TODO: get WorldModel rotatedregion3s working, or another workaround
-export function getRecreatedPlayer (time: number): Model {
+export function getRecreatedPlayer (name: string, time: number): Model {
   const outModel = new Instance('Model')
   const snapshots = getSnapshots(time)
+  let limbs: Limb[] | undefined
   if (snapshots.size() === 2) {
-
+    const alpha = remapSnapshots(snapshots, time)
+    const snapshot1 = snapshots[0].players.get(name)
+    const snapshot2 = snapshots[1].players.get(name)
+    if (snapshot1 === undefined || snapshot2 === undefined) {
+      return outModel
+    }
+    limbs = interpolateLimbs(snapshot1, snapshot2, alpha)
+  } else if (snapshots.size() === 1) {
+    const snapshot = snapshots[0].players.get(name)
+    if (snapshot === undefined) {
+      return outModel
+    }
+    limbs = []
+    snapshot.forEach((value) => limbs?.push(value))
   } else if (snapshots.isEmpty()) {
     // we don't need to do anything more
     return outModel
   }
+  if (limbs === undefined) { // either #snapshots > 3, or another edge case broke this
+    return outModel
+  }
+  const reconstructed = reconstruct(limbs)
+  reconstructed.forEach((part) => { part.Parent = outModel })
   return outModel
 }
