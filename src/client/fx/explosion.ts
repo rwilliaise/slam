@@ -9,7 +9,7 @@ export class DefaultExplosion extends Particle {
     explosion.BlastPressure = 0
     explosion.Position = position
     explosion.Parent = Workspace
-    Debris.AddItem(explosion, 5)
+    Debris.AddItem(explosion, 2)
   }
 }
 
