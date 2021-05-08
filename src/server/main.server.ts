@@ -1,9 +1,9 @@
 import { Players } from '@rbxts/services'
-import { ChadCharacter } from 'shared/character/chad'
+import { PityCharacter } from 'shared/character/pity'
 import * as MasterClock from './hitreg/clock'
 
 function connectPlayer (player: Player): void {
-  const char = new ChadCharacter(player)
+  const char = new PityCharacter(player)
   char.pollEvents()
 }
 

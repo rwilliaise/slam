@@ -6,12 +6,13 @@ import { Character } from './character'
 /** Punch-based character. */
 export class ChadCharacter extends Character {
   private punchTrack?: AnimationTrack = undefined
-  private animation!: Animation
+  private readonly animation: Animation
 
   private character?: Model
 
-  init (): void {
-    const punch = this.registerMove(Enum.UserInputType.MouseButton1)
+  constructor (player: Player) {
+    super(player)
+    const punch = this.createMove(Enum.UserInputType.MouseButton1)
     punch.callback = (state) => this.tryPunch(state)
     punch.cooldown = 0.85 // 1 sec cooldown
     this.animation = new Instance('Animation')

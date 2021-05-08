@@ -1,9 +1,9 @@
 import { Players } from '@rbxts/services'
-import { ChadCharacter } from 'shared/character/chad'
+import { PityCharacter } from 'shared/character/pity'
 import { promiseError } from 'shared/utils'
 import mount from './ui'
 
-const chad = new ChadCharacter(Players.LocalPlayer)
+const chad = new PityCharacter(Players.LocalPlayer)
 chad.pollEvents()
 
 mount()

@@ -1,34 +1,37 @@
-/**
- * This is NOT hitscan - that is, the bullets do not get to their destination instantly. For that, please visit
- * hitscan.ts.
- */
-
 import FastCast from '@rbxts/fastcast'
 import Object from '@rbxts/object-utils'
 import { Workspace } from '@rbxts/services'
-import { Character } from 'shared/character/character'
 
 const _tmpProjFolder = Workspace.FindFirstChild('ProjectileFolder')
 export const ProjectileFolder = (_tmpProjFolder !== undefined) ? _tmpProjFolder : new Instance('Folder', Workspace)
 ProjectileFolder.Name = 'ProjectileFolder'
 
-/** A projectile based character. This should be used if you have at least one projectile in your character. */
-export class ProjectileCharacter extends Character {
+// TODO: hitscan firemechanism (might not be needed)
+/** Used to create different types of guns; i.e. crossbow or a glock. */
+export abstract class FireMechanism {
+  abstract fire (origin: Vector3, direction: Vector3): void
+}
+
+// FastCast.VisualizeCasts = true
+
+/** Projectile firing style. Works during prediction. */
+export class ProjectileMechanism extends FireMechanism {
   caster: FastCast.Caster = FastCast.new()
   castParams = new RaycastParams()
-  maxDistance = 1024
+  _bulletSpeed = 100
+  _behavior?: FastCast.FastCastBehavior
 
-  init (): void {
+  constructor () {
+    super()
+    // this is horrible, but it would be 10x longer otherwise :/
+    this.caster.RayHit.Connect((a, b, c, d) => this.onRayHit(a, b, c, d))
+    this.caster.CastTerminating.Connect((a) => this.onRayTerminated(a))
+    this.caster.RayPierced.Connect((a, b, c, d) => this.onRayPierced(a, b, c, d))
+    this.caster.LengthChanged.Connect((a, b, c, d, e, f) => this.onLengthChanged(a, b, c, d, e, f))
     this.castParams.IgnoreWater = true
     this.castParams.FilterType = Enum.RaycastFilterType.Blacklist
     this.castParams.FilterDescendantsInstances = []
-  }
-
-  pollEvents (): void {
-    super.pollEvents()
-    this.caster.RayHit.Connect(this.onRayHit)
-    this.caster.RayPierced.Connect(this.onRayPierced)
-    this.caster.LengthChanged.Connect(this.onLengthChanged)
+    this.behavior()
   }
 
   /** Fires whenever the projectile moves */
@@ -69,14 +72,26 @@ export class ProjectileCharacter extends Character {
     segmentVelocity: Vector3
   ) => boolean = () => false
 
-  /** Create a new cast behavior. Shorthand for manually doing it. */
-  newBehavior (options?: Partial<FastCast.FastCastBehavior>): FastCast.FastCastBehavior {
-    const behavior = FastCast.newBehavior()
-    Object.assign(behavior, {
-      RaycastParams: this.castParams,
-      MaxDistance: this.maxDistance
-    })
-    Object.assign(behavior, options)
-    return behavior
+  /** Set a new cast behavior. Shorthand for manually doing it. */
+  behavior (options?: Partial<FastCast.FastCastBehavior>): this {
+    if (this._behavior === undefined) {
+      this._behavior = FastCast.newBehavior()
+      Object.assign(this._behavior, {
+        RaycastParams: this.castParams,
+        CanPierceFunction: (a: FastCast.ActiveCast, b: RaycastResult, c: Vector3) => this.canPierce(a, b, c),
+        CosmeticBulletContainer: ProjectileFolder
+      })
+    }
+    Object.assign(this._behavior, options)
+    return this
+  }
+
+  bulletSpeed (speed: number): this {
+    this._bulletSpeed = speed
+    return this
+  }
+
+  fire (origin: Vector3, direction: Vector3): void {
+    this.caster.Fire(origin, direction, this._bulletSpeed, this._behavior)
   }
 }

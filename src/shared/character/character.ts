@@ -53,13 +53,6 @@ export class Character {
       })
         .catch((err) => { $print(err) })
     }
-    this.init(player)
-  }
-
-  /** Shorthand for use if you are too lazy to override constructor. */
-  init (player: Player): void
-  init (): void {
-
   }
 
   /**
@@ -133,7 +126,7 @@ export class Character {
    * @param keyCodes Keycodes for the move to fire on (unused on server)
    * @returns The move for editing
    */
-  registerMove (...keyCodes: ActionType[]): Move {
+  createMove (...keyCodes: ActionType[]): Move {
     const id = tostring(this.moveId++)
     const move: Move = { predicted: true } // predict all moves by default
     this.moveMap.set(id, move)
