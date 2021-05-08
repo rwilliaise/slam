@@ -53,6 +53,13 @@ export class Character {
       })
         .catch((err) => { $print(err) })
     }
+    this.init(player)
+  }
+
+  /** Shorthand for use if you are too lazy to override constructor. */
+  init (player: Player): void
+  init (): void {
+
   }
 
   /**
@@ -114,9 +121,7 @@ export class Character {
   /**
    * Called when the character is added.
    */
-  onCharacterAdded (character: Model): void {
-
-  }
+  onCharacterAdded (character: Model): void {}
 
   /**
    * Called every frame.

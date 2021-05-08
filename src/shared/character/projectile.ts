@@ -18,8 +18,7 @@ export class ProjectileCharacter extends Character {
   castParams = new RaycastParams()
   maxDistance = 1024
 
-  constructor (player: Player) {
-    super(player)
+  init (): void {
     this.castParams.IgnoreWater = true
     this.castParams.FilterType = Enum.RaycastFilterType.Blacklist
     this.castParams.FilterDescendantsInstances = []
@@ -32,6 +31,7 @@ export class ProjectileCharacter extends Character {
     this.caster.LengthChanged.Connect(this.onLengthChanged)
   }
 
+  /** Fires whenever the projectile moves */
   onLengthChanged: (
     cast: FastCast.ActiveCast,
     segmentOrigin: Vector3,
@@ -49,7 +49,7 @@ export class ProjectileCharacter extends Character {
     bullet?: Instance
   ) => void = () => {}
 
-  /**  */
+  /** Fired whenever the ray pierces an object. Only fires if .canPierce returns true. */
   onRayPierced: (
     cast: FastCast.ActiveCast,
     result: RaycastResult,
@@ -62,8 +62,15 @@ export class ProjectileCharacter extends Character {
     cast: FastCast.ActiveCast
   ) => void = () => {}
 
+  /** Used to see if a given object can be pierced. */
+  canPierce: (
+    cast: FastCast.ActiveCast,
+    result: RaycastResult,
+    segmentVelocity: Vector3
+  ) => boolean = () => false
+
   /** Create a new cast behavior. Shorthand for manually doing it. */
-  newBehavior (options?: FastCast.FastCastBehavior): FastCast.FastCastBehavior {
+  newBehavior (options?: Partial<FastCast.FastCastBehavior>): FastCast.FastCastBehavior {
     const behavior = FastCast.newBehavior()
     Object.assign(behavior, {
       RaycastParams: this.castParams,
