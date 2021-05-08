@@ -1,8 +1,6 @@
-import { ReplicatedStorage, Workspace } from '@rbxts/services'
+import { Debris, ReplicatedStorage, Workspace } from '@rbxts/services'
 import { Character } from './character'
 import { ProjectileMechanism } from '../hitreg/projectile'
-import { $print } from 'rbxts-transform-debug'
-import { isServer } from 'shared/utils'
 
 const Arrow = ReplicatedStorage.WaitForChild('Arrow') as BasePart
 
@@ -26,21 +24,29 @@ export class PityCharacter extends Character {
       bullet.CFrame = baseCFrame.mul(new CFrame(0, 0, -(length - bulletLength)))
     }
     this.crossbowMechanism.onRayHit = (cast, result, segmentVelocity, bullet) => {
-      $print('Hit!')
+      const hitPart = result.Instance
+      if (hitPart?.Parent !== undefined) {
+        const humanoid = hitPart.FindFirstAncestorOfClass('Model')?.FindFirstChildOfClass('Humanoid')
+        if (humanoid !== undefined) {
+          humanoid.TakeDamage(10)
+        }
+      }
+    }
+    this.crossbowMechanism.onRayTerminated = (cast) => {
+      const bullet = cast.RayInfo.CosmeticBulletObject
+      if (bullet !== undefined) {
+        Debris.AddItem(bullet, 3) // FIXME: don't use debris
+      }
     }
     const primary = this.createMove(Enum.UserInputType.MouseButton1)
-    primary.predicted = true
+    primary.predicted = false
     primary.callback = (state, _, hit) => this.primaryFire(state, hit)
   }
 
   primaryFire (state: Enum.UserInputState, hit: CFrame): void {
-    if (isServer()) {
-      return
-    }
     if (state !== Enum.UserInputState.Begin) {
       return
     }
-    $print('Firing!')
     const rootPart = this.character.WaitForChild('HumanoidRootPart') as BasePart
     const position = rootPart.Position.add(new Vector3(0, 5, 0))
     this.crossbowMechanism.fire(position, hit.Position.sub(position))
