@@ -20,9 +20,11 @@
   "devDependencies": {
     "@rbxts/abstractify": "^1.1.5",
     "@rbxts/compiler-types": "^1.0.0-types.0",
+    "@rbxts/fastcast": "^1.4.0",
     "@rbxts/flipper": "^2.0.0",
     "@rbxts/lerp-functions": "^1.0.1",
     "@rbxts/object-utils": "^1.0.4",
+    "@rbxts/profileservice": "^1.3.0",
     "@rbxts/roact": "*",
     "@rbxts/rotatedregion3": "^1.2.0",
     "@rbxts/services": "^1.1.4",

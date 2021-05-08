@@ -1,15 +1,21 @@
-import { ContextActionService } from '@rbxts/services'
+import { ContextActionService, Players } from '@rbxts/services'
 import { isClient, isServer, promiseError } from 'shared/utils'
 import { $print } from 'rbxts-transform-debug'
 import { ipcClient, ipcServer } from '@rbxts/abstractify'
 
 type ActionType = Enum.KeyCode | Enum.PlayerActions | Enum.UserInputType
 
+let LocalPlayer: Player, Mouse: PlayerMouse
+if (isClient()) {
+  LocalPlayer = Players.LocalPlayer
+  Mouse = LocalPlayer.GetMouse()
+}
+
 /**
  * A move that a character can do.
  */
 interface Move {
-  callback?: (state: Enum.UserInputState, inputObject?: InputObject) => unknown
+  callback?: (state: Enum.UserInputState, inputObject: InputObject | undefined, hit: CFrame) => unknown
   cooldown?: number
   predicted: boolean
 }
@@ -33,7 +39,7 @@ export class Character {
     // all inputs are captured and run on both sides, making high ping feel less
     // TODO: lag compensation - there should be lag comp for both melee and ranged attacks, but that will be difficult
     if (isServer()) {
-      ipcServer.on('moveInput', (player: Player, name: string, state) => {
+      ipcServer.on('moveInput', (player: Player, name: string, state, hit: CFrame) => {
         if (player === this.player) {
           if (this.getCooldown(name, state)) {
             $print(`Move with id: ${name} is on cooldown. Please wait!`)
@@ -41,7 +47,7 @@ export class Character {
           }
           let move: Move | undefined
           if ((move = this.moveMap.get(name)) !== undefined && move.callback !== undefined) {
-            move.callback(state)
+            move.callback(state, undefined, hit)
           }
         }
       })
@@ -83,11 +89,11 @@ export class Character {
         $print(`Move with id: ${name} is on cooldown. Please wait!`)
         return
       }
-      ipcClient.emit('moveInput', name, state).catch(promiseError)
+      ipcClient.emit('moveInput', name, state, Mouse.Hit).catch(promiseError)
       if (move.predicted) {
         $print('Predicting!')
         debug.profilebegin('NetPredict') // prediction profile
-        move.callback(state, inputObject)
+        move.callback(state, inputObject, Mouse.Hit)
         debug.profileend()
       }
       return

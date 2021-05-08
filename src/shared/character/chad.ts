@@ -1,5 +1,5 @@
 import { Workspace } from '@rbxts/services'
-import { tryMelee } from 'shared/hitreg'
+import { unCompensatedTryMelee } from 'shared/hitreg'
 import { isClient, isServer, promiseError } from 'shared/utils'
 import { Character } from './character'
 
@@ -13,7 +13,7 @@ export class ChadCharacter extends Character {
   constructor (player: Player) {
     super(player)
     const punch = this.registerMove(Enum.UserInputType.MouseButton1)
-    punch.callback = (state, obj) => this.tryPunch(state, obj)
+    punch.callback = (state) => this.tryPunch(state)
     punch.cooldown = 0.85 // 1 sec cooldown
     this.animation = new Instance('Animation')
     this.animation.AnimationId = 'rbxassetid://6053790188'
@@ -36,7 +36,7 @@ export class ChadCharacter extends Character {
       })
   }
 
-  tryPunch (state: Enum.UserInputState, obj?: InputObject): void {
+  tryPunch (state: Enum.UserInputState): void {
     if (state !== Enum.UserInputState.Begin) {
       return
     }
@@ -70,7 +70,7 @@ export class ChadCharacter extends Character {
       }
       part.Transparency = 0.5
       part.Parent = Workspace
-      const result = tryMelee(charCFrame.mul(new CFrame(0, 0, -2)), new Vector3(4, 4, 4), { ignorePlayer: this.player })
+      const result = unCompensatedTryMelee(charCFrame.mul(new CFrame(0, 0, -2)), new Vector3(4, 4, 4), { ignorePlayers: this.player })
       if (result.hitHumanoid !== undefined) {
         result.hitHumanoid.TakeDamage(10) // TODO: damage system, different damage types for damage invulns and counters
       }

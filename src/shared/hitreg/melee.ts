@@ -15,7 +15,7 @@ export interface MeleeOptions extends HitOptions {
  * @param size Size of melee hitbox.
  * @param options Options for the melee operation.
  */
-export function tryMelee (cframe: CFrame, size: Vector3, options?: MeleeOptions): HitResult {
+export function unCompensatedTryMelee (cframe: CFrame, size: Vector3, options?: MeleeOptions): HitResult {
   if (options?.whitelist !== undefined && options.blacklist !== undefined) {
     warnThread()
     error('Unexpected state: both whitelist and blacklist are defined!')
@@ -28,8 +28,14 @@ export function tryMelee (cframe: CFrame, size: Vector3, options?: MeleeOptions)
       options.blacklist.forEach((value) => ignore.push(value))
     }
     // ignore player if given
-    if (options?.ignorePlayer !== undefined && options.ignorePlayer.Character !== undefined) {
-      ignore.push(options.ignorePlayer.Character)
+    if (options?.ignorePlayers !== undefined) {
+      if (type(options?.ignorePlayers) === 'table') {
+        ((options.ignorePlayers as Player[])
+          .mapFiltered((value) => value.Character))
+          .forEach((value) => ignore.push(value))
+      } else if ((options.ignorePlayers as Player).Character !== undefined) {
+        ignore.push((options.ignorePlayers as Player).Character as Model)
+      }
     }
     parts = hbox.FindPartsInRegion3WithIgnoreList(ignore, options?.maxParts)
   } else {

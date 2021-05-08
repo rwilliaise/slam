@@ -21,12 +21,16 @@ export interface HitResult {
 
 /** Options for a hit calculation */
 export interface HitOptions {
-  /** Ignore specific player */
-  ignorePlayer?: Player
-  /** Ignore all water (does not apply to melee) */
-  ignoreWater?: boolean
+  /** Ignore specific player or players */
+  ignorePlayers?: Player | Player[]
   /** A list of Instances (including their children) to seek out when casting. Mutally exclusive with `blacklist`. */
   whitelist?: Instance[]
   /** A list of Instances (including their children) to ignore when casting. Mutally exclusive with `whitelist`. */
   blacklist?: Instance[]
+}
+
+/** Options for a projectile or hitscan calculation */
+export interface RangedOptions {
+  /** Ignore all water */
+  ignoreWater?: boolean
 }
