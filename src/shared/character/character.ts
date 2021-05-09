@@ -60,15 +60,20 @@ export class Character {
 
   /** This should disconnect all events relating to the character. */
   destroy (): void {
+    $print('Cleaning up!')
     this.characterAdded.Disconnect()
     if (isClient()) {
+      $print('isClient - cleaning up moves!')
       this.moveMap.forEach((_, key) => {
+        $print('Cleaning up move ' + key)
         ContextActionService.UnbindAction(key)
       })
     }
     if (isServer()) {
+      $print('isServer - cleaning up moveInput!')
       this.netMoveInput.Disconnect()
     }
+    $print('Cleaning up - Done!')
   }
 
   /**
