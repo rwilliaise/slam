@@ -1,6 +1,7 @@
 import { ipcClient } from '@rbxts/abstractify'
 import Roact from '@rbxts/roact'
 import { ContextActionService, RunService } from '@rbxts/services'
+import { selectCharacter } from 'client/selection'
 import { $print } from 'rbxts-transform-debug'
 import CharacterMetadata from 'shared/character/metadata.json'
 import { promiseError } from 'shared/utils'
@@ -254,6 +255,9 @@ export class CharacterSelection extends Roact.PureComponent<{}, { SelectedCharac
       Open: false
     })
     ipcClient.emit('characterSelect', this.state.SelectedCharacter?.id).catch(promiseError)
+    if (this.state.SelectedCharacter !== undefined) {
+      selectCharacter(this.state.SelectedCharacter.id)
+    }
   }
 
   openScreen: () => void = () => {

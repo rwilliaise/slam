@@ -1,6 +1,8 @@
+import { ipcServer } from '@rbxts/abstractify'
 import { Players } from '@rbxts/services'
+import { promiseError } from 'shared/utils'
 import * as MasterClock from './hitreg/clock'
-import { connect } from './selection'
+import { disconnect, handleSelection } from './selection'
 
 Players.PlayerAdded.Connect((player: Player) => {
   function characterAdded (character: Model): void {
@@ -18,5 +20,7 @@ Players.PlayerAdded.Connect((player: Player) => {
   }
 })
 
-connect()
+Players.PlayerRemoving.Connect(disconnect)
+
+ipcServer.on('characterSelect', handleSelection).catch(promiseError)
 MasterClock.forceSync()

@@ -30,14 +30,15 @@ export class Character {
   private readonly cooldownMap: Map<string, number> = new Map()
   private moveId: number = 0
 
+  characterAdded!: RBXScriptConnection
+  netMoveInput!: RBXScriptConnection
+
   /**
    * Takes in a player and binds the character to them
    * @param player Player to bind to
    */
   constructor (public player: Player) {
-    // this.pollEvents()
-    // all inputs are captured and run on both sides, making high ping feel less
-    // TODO: lag compensation - there should be lag comp for both melee and ranged attacks, but that will be difficult
+    // FIXME: there should really only be one connection, this wastes memory
     if (isServer()) {
       ipcServer.on('moveInput', (player: Player, name: string, state, hit: CFrame) => {
         if (player === this.player) {
@@ -51,7 +52,22 @@ export class Character {
           }
         }
       })
-        .catch((err) => { $print(err) })
+        .then((connection) => {
+          this.netMoveInput = connection
+        }, promiseError)
+    }
+  }
+
+  /** This should disconnect all events relating to the character. */
+  destroy (): void {
+    this.characterAdded.Disconnect()
+    if (isClient()) {
+      this.moveMap.forEach((_, key) => {
+        ContextActionService.UnbindAction(key)
+      })
+    }
+    if (isServer()) {
+      this.netMoveInput.Disconnect()
     }
   }
 
@@ -105,7 +121,7 @@ export class Character {
    * Binds events to the player.
    */
   pollEvents (): void {
-    this.player.CharacterAdded.Connect((character: Model) => this.onCharacterAdded(character))
+    this.characterAdded = this.player.CharacterAdded.Connect((character: Model) => this.onCharacterAdded(character))
     if (this.player.Character !== undefined) {
       this.onCharacterAdded(this.player.Character)
     }
