@@ -1,0 +1,52 @@
+[
+  {
+    "id": "chad",
+    "name": "Chad",
+    "description": "Finding his love life wasn't working, Chad made a fist life.",
+    "image": "rbxassetid://5633843412",
+    "info": {
+      "health": 150,
+      "speed": "Slow",
+      "damage": "High"
+    },
+    "strategies": [
+      "As Chad, your only weapons are your fists.",
+      "Charge into battle unexpected. Your health pool might be high, but people can walk a lot faster than you run.",
+      "You can dash around. This dash, however, does not leave you invincible."
+    ]
+  },
+
+  {
+    "id": "pity",
+    "name": "Pity",
+    "description": "Wandering the plains, Pity healed townfolk with an arrow through the head. He owned an insurance firm.",
+    "image": "rbxassetid://572372838",
+    "info": {
+      "health": 100,
+      "speed": "Average",
+      "damage": "Poor"
+    },
+    "strategies": [
+      "As Pity, you can heal anyone.",
+      "Make fights unfair by healing the attacker. Pick off those who walk away.",
+      "Your bombs are unavoidable as much as they are expected. Roll them around corners."
+    ]
+  },
+
+  {
+    "id": "wimp",
+    "name": "Wimp",
+    "description": "In life, Wimp started out running. Then he kept running. As a baby, he ran out of the womb.",
+    "image": "rbxassetid://62422577",
+    "info": {
+      "health": 80,
+      "speed": "Fast",
+      "damage": "Average"
+    },
+    "strategies": [
+      "As Pansy, you run fast. Evade enemies and choose your fights.", 
+      "As the weakest character in the game, you must use your environment to your advantage.",
+      "Your gun is not strong at long range. Get close to enemies to kill most characters in 2 hits."
+    ]
+  }
+]

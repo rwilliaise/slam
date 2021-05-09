@@ -3,6 +3,7 @@ import Roact from '@rbxts/roact'
 import * as Flipper from '@rbxts/flipper'
 import { Players } from '@rbxts/services'
 import { promiseError } from 'shared/utils'
+import { CharacterSelection } from './character'
 
 const BarSizeInterp = Lerps.UDim2(new UDim2(0, 10, 1, 0), UDim2.fromScale(1, 1))
 const BarColorInterp = Lerps.Color3(new Color3(0.8, 0.1, 0.1), new Color3(0.1, 0.8, 0.1))
@@ -92,6 +93,7 @@ export class HudScreen extends Roact.PureComponent<{}, { Health: number }> {
         BackgroundTransparency={1}
       >
         <Healthbar Position={new UDim2(0.5, 0, 1, -20)} Health={this.state.Health} />
+        <CharacterSelection />
       </frame>
     )
   }

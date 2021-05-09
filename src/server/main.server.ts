@@ -1,14 +1,22 @@
 import { Players } from '@rbxts/services'
-import { PityCharacter } from 'shared/character/pity'
 import * as MasterClock from './hitreg/clock'
+import { connect } from './selection'
 
-function connectPlayer (player: Player): void {
-  const char = new PityCharacter(player)
-  char.pollEvents()
-}
+Players.PlayerAdded.Connect((player: Player) => {
+  function characterAdded (character: Model): void {
+    const humanoid = character.FindFirstChildOfClass('Humanoid')
+    if (humanoid !== undefined) {
+      humanoid.Died.Connect(() => {
+        player.LoadCharacter()
+      })
+    }
+  }
 
-Players.PlayerAdded.Connect(connectPlayer)
+  player.CharacterAdded.Connect(characterAdded)
+  if (player.Character !== undefined) {
+    characterAdded(player.Character)
+  }
+})
 
-Players.GetPlayers().forEach(connectPlayer)
-
+connect()
 MasterClock.forceSync()

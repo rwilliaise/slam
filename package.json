@@ -28,6 +28,7 @@
     "@rbxts/roact": "*",
     "@rbxts/rotatedregion3": "^1.2.0",
     "@rbxts/services": "^1.1.4",
+    "@rbxts/testez": "^0.3.1-ts.6",
     "@rbxts/types": "^1.0.479",
     "rbxts-transform-debug": "^0.4.0",
     "rbxts-transformer-services": "^1.0.0",
