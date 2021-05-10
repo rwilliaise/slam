@@ -34,5 +34,8 @@
     "rbxts-transformer-services": "^1.0.0",
     "roblox-ts": "^1.1.1",
     "ts-standard": "^10.0.0"
+  },
+  "ts-standard": {
+    "project": "./dev.tsconfig.json"
   }
 }

@@ -2,7 +2,8 @@ import { ipcClient, ipcServer } from '@rbxts/abstractify'
 import FastCast from '@rbxts/fastcast'
 import Object from '@rbxts/object-utils'
 import { Players, Workspace } from '@rbxts/services'
-import { isClient, promiseError } from 'shared/utils'
+import { $dbg, $print } from 'rbxts-transform-debug'
+import { isClient, isServer, promiseError } from 'shared/utils'
 import { PartialDeep } from './regtils'
 
 const _tmpProjFolder = Workspace.FindFirstChild('ProjectileFolder')
@@ -23,7 +24,8 @@ export interface Projectile {
   terminated: (casterThatFired: FastCast.ActiveCast) => void
 }
 
-const defaultBehavior = FastCast.newBehavior();
+const defaultBehavior = FastCast.newBehavior()
+defaultBehavior.RaycastParams = new RaycastParams();
 (defaultBehavior as unknown as { CosmeticBulletContainer: Instance }).CosmeticBulletContainer = ProjectileFolder
 
 const defaultOptions: Projectile = {
@@ -47,11 +49,29 @@ export function add (name: string, projectile: PartialDeep<Projectile>): Partial
   return projectile
 }
 
-ipcServer.getEvent('projectileFired')
+if (isServer()) {
+  ipcServer.getEvent('projectileFired')
+}
+function addIgnore (projectile: PartialDeep<Projectile>, ignore: Instance): PartialDeep<Projectile> {
+  // copy the projectile
+  const out = Object.deepCopy(projectile)
+  if (out.behavior === undefined) {
+    out.behavior = FastCast.newBehavior()
+  }
+  // since the behaviors raycastparams arent exact, lets just copy the properties over
+  const params = new RaycastParams()
+  if (out.behavior.RaycastParams !== undefined) {
+    Object.assign(params, out.behavior.RaycastParams)
+  }
+  params.FilterDescendantsInstances = [ignore]
+  out.behavior.RaycastParams = params
+  $dbg(out)
+  return out
+}
 
 /** Replicate a projectile from a player to all other players */
-export function fireReplicated (origin: Vector3, direction: Vector3, player: Player, projectile: PartialDeep<Projectile>): void {
-  fire(origin, direction, projectile)
+export function fireReplicated (origin: Vector3, direction: Vector3, player: Player, projectile: PartialDeep<Projectile>, ignore?: Instance): void {
+  fire(origin, direction, projectile, ignore)
   if (isClient()) {
     return
   }
@@ -62,11 +82,14 @@ export function fireReplicated (origin: Vector3, direction: Vector3, player: Pla
     }
   })
   if (foundKey !== undefined) {
-    ipcServer.broadcast('projectileFired', origin, direction, player, foundKey)
+    ipcServer.broadcast('projectileFired', origin, direction, player, foundKey, ignore)
   }
 }
 
-export function fire (origin: Vector3, direction: Vector3, dataPacket: PartialDeep<Projectile>): void {
+export function fire (origin: Vector3, direction: Vector3, dataPacket: PartialDeep<Projectile>, ignore?: Instance): void {
+  if (ignore !== undefined) {
+    dataPacket = addIgnore(dataPacket, ignore)
+  }
   let behaviorCopy
   if (dataPacket.behavior !== undefined) {
     behaviorCopy = Object.copy(dataPacket.behavior)
@@ -80,13 +103,15 @@ export function fire (origin: Vector3, direction: Vector3, dataPacket: PartialDe
 }
 
 if (isClient()) {
-  ipcClient.on('projectileFired', (origin: Vector3, direction: Vector3, player: Player, foundKey: string) => {
+  ipcClient.on('projectileFired', (origin: Vector3, direction: Vector3, player: Player, foundKey: string, ignore?: Instance) => {
     if (player === Players.LocalPlayer) {
       return
     }
     const projectile = ProjectileMap.get(foundKey)
     if (projectile !== undefined) {
-      fire(origin, direction, projectile)
+      fire(origin, direction, projectile, ignore)
     }
+  }).then((value) => {
+    $print(value)
   }).catch(promiseError)
 }
