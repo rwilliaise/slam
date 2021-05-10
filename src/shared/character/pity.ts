@@ -1,7 +1,7 @@
-import { Debris, ReplicatedStorage, Workspace } from '@rbxts/services'
+import { Debris, Players, ReplicatedStorage, Workspace } from '@rbxts/services'
 import { Character } from './character'
-import { add, fireReplicated } from '../hitreg/projectile'
-import { isServer } from 'shared/utils'
+import { add, fireReplicated, ProjectileFolder } from '../hitreg/projectile'
+import { isClient, isServer } from 'shared/utils'
 
 const Arrow = ReplicatedStorage.WaitForChild('Arrow') as BasePart
 
@@ -47,6 +47,9 @@ export class PityCharacter extends Character {
     primary.predicted = true
     primary.cooldown = 0.5
     primary.callback = (state, _, hit) => this.primaryFire(state, hit)
+    if (isClient()) {
+      Players.LocalPlayer.GetMouse().TargetFilter = ProjectileFolder
+    }
   }
 
   primaryFire (state: Enum.UserInputState, hit: CFrame): void {
