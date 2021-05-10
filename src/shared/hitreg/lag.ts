@@ -15,7 +15,7 @@
  */
 
 import { Players } from '@rbxts/services'
-import { LAG_COMP_MEMORY_SECONDS, LAG_COMP_MEMORY_SIZE, LAG_COMP_RESOLUTION } from 'shared/hitreg'
+import { LAG_COMP_MEMORY_SECONDS, LAG_COMP_MEMORY_SIZE, LAG_COMP_RESOLUTION } from 'shared/hitreg/regtils'
 
 /** A players limb. Should reconstruct the original limb with as little data we can give. */
 interface Limb {

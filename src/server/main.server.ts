@@ -1,7 +1,7 @@
 import { ipcServer } from '@rbxts/abstractify'
 import { Players } from '@rbxts/services'
 import { promiseError } from 'shared/utils'
-import * as MasterClock from './hitreg/clock'
+import * as MasterClock from './clock'
 import { disconnect, handleSelection } from './selection'
 
 Players.PlayerAdded.Connect((player: Player) => {

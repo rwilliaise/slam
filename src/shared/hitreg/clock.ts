@@ -1,7 +1,12 @@
+import { isServer, promiseError } from 'shared/utils'
 import { ipcClient } from '@rbxts/abstractify'
 import { ReplicatedStorage } from '@rbxts/services'
 import { $print, $warn } from 'rbxts-transform-debug'
-import { promiseError } from 'shared/utils'
+
+if (isServer()) {
+  // stop the script if we are server-side
+  error()
+}
 
 const SyncFunction = ReplicatedStorage.WaitForChild('SyncHitreg') as RemoteFunction
 

@@ -5,32 +5,58 @@ export const LAG_COMP_MEMORY_SIZE = 15
 /** How many seconds between snapshots; in other words the resolution of lag compensation. Should be >=0.1 */
 export const LAG_COMP_RESOLUTION = 0.1
 
-/** Result of a hit */
-export interface HitResult {
-  /** Parts that were hit */
-  hitParts?: BasePart[]
-  /** Part that was hit (for raycasts) */
-  hitPart?: BasePart
-  /** Hit player, if there was one */
-  hitPlayer?: Player
-  /** Hit humanoid, if there was */
-  hitHumanoid?: Humanoid
-  /** Used to see if the hit had hit anything */
-  hitAnything: boolean
+export interface HitParams {
+  /** Instances that should be ignored/searched for. */
+  FilterDescendantsInstances?: Instance[]
+  /** Which filter type to use. */
+  FilterType?: Enum.RaycastFilterType
 }
 
-/** Options for a hit calculation */
-export interface HitOptions {
-  /** Ignore specific player or players */
-  ignorePlayers?: Player | Player[]
-  /** A list of Instances (including their children) to seek out when casting. Mutally exclusive with `blacklist`. */
-  whitelist?: Instance[]
-  /** A list of Instances (including their children) to ignore when casting. Mutally exclusive with `whitelist`. */
-  blacklist?: Instance[]
+export enum HitType {
+  PROJECTILE,
+  MELEE
 }
 
-/** Options for a projectile or hitscan calculation */
-export interface RangedOptions {
-  /** Ignore all water */
-  ignoreWater?: boolean
+export interface HitDataPacket {
+  type: HitType
+  options: {
+    hit: Callback
+  }
+}
+
+export type Primitive =
+        | null
+        | undefined
+        | string
+        | number
+        | boolean
+        | symbol
+        | bigint
+
+export type PartialDeep<T> = T extends Primitive
+  ? Partial<T>
+  : T extends Map<infer KeyType, infer ValueType>
+    ? PartialMapDeep<KeyType, ValueType>
+    : T extends Set<infer ItemType>
+      ? PartialSetDeep<ItemType>
+      : T extends ReadonlyMap<infer KeyType, infer ValueType>
+        ? PartialReadonlyMapDeep<KeyType, ValueType>
+        : T extends ReadonlySet<infer ItemType>
+          ? PartialReadonlySetDeep<ItemType>
+          : T extends ((...args: any[]) => unknown)
+            ? T | undefined
+            : T extends object
+              ? PartialObjectDeep<T>
+              : unknown
+
+interface PartialMapDeep<KeyType, ValueType> extends Map<PartialDeep<KeyType>, PartialDeep<ValueType>> {}
+
+interface PartialSetDeep<T> extends Set<PartialDeep<T>> {}
+
+interface PartialReadonlyMapDeep<KeyType, ValueType> extends ReadonlyMap<PartialDeep<KeyType>, PartialDeep<ValueType>> {}
+
+interface PartialReadonlySetDeep<T> extends ReadonlySet<PartialDeep<T>> {}
+
+type PartialObjectDeep<ObjectType extends object> = {
+  [KeyType in keyof ObjectType]?: PartialDeep<ObjectType[KeyType]>
 }
