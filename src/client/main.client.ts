@@ -1,6 +1,6 @@
 import { ipcClient } from '@rbxts/abstractify'
 import { Players } from '@rbxts/services'
-import { ProjectileMap, firePredicted } from 'shared/hitreg/projectile'
+import { fire, ProjectileMap, ProjectilePredictor } from 'shared/hitreg/projectile'
 import { promiseError } from 'shared/utils'
 import * as SlaveClock from 'shared/hitreg/clock'
 import mount from './ui'
@@ -14,8 +14,19 @@ ipcClient.on('projectileFired', (time: number, origin: Vector3, direction: Vecto
   }
   const projectile = ProjectileMap.get(foundKey)
   if (projectile !== undefined) {
-    const timeAhead = SlaveClock.getTime() - time
-    firePredicted(timeAhead, origin, direction, projectile, ignore)
+    const accel = projectile.behavior?.Acceleration
+    if (accel !== undefined && accel.Magnitude !== 0) {
+      fire(origin, direction, projectile, ignore)
+    } else {
+      const timeAhead = SlaveClock.getTime() - time
+      let predictor
+      if (ignore !== undefined) {
+        predictor = new ProjectilePredictor(timeAhead, origin, direction, projectile, ignore)
+      } else {
+        predictor = new ProjectilePredictor(timeAhead, origin, direction, projectile)
+      }
+      predictor.fire()
+    }
   }
 }).catch(promiseError)
 
