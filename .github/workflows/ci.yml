@@ -1,0 +1,56 @@
+name: CI
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: install npm packages
+        uses: bahmutov/npm-install@v1
+
+      - name: run standard
+        run: npm run ts-standard
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: install roblox-ts
+      run: npm i -g roblox-ts@1.1.1
+
+    - name: install local npm packages
+      run: npm i --production=false
+      
+    - name: compile typescript code
+      run: rbxtsc --type=game
+
+    - uses: leafo/gh-actions-lua@v8
+      with:
+        luaVersion: "5.1"
+
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: Install dependencies
+      run: |
+        luarocks install luafilesystem
+        luarocks install luacov
+        luarocks install luacov-reporter-lcov
+        luarocks install luacheck
+
+    - name: Test
+      run: |
+        lua -lluacov bin/spec.lua
+        luacheck src benchmarks examples
+        luacov -r lcov
+
+    - name: Report to Coveralls
+      uses: coverallsapp/github-action@v1.1.2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: luacov.report.out

@@ -29,5 +29,3 @@ ipcClient.on('projectileFired', (time: number, origin: Vector3, direction: Vecto
     }
   }
 }).catch(promiseError)
-
-// TODO: !! IMPORTANT !! find feasible place to put the time syncing.
