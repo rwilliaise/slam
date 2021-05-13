@@ -1,7 +1,8 @@
 import { ipcServer } from '@rbxts/abstractify'
-import { Players } from '@rbxts/services'
+import { Players, RunService } from '@rbxts/services'
 import { promiseError } from 'shared/utils'
 import * as MasterClock from './clock'
+import * as LagCompensation from 'shared/hitreg/lag'
 import { disconnect, handleSelection } from './selection'
 
 Players.PlayerAdded.Connect((player: Player) => {
@@ -24,3 +25,7 @@ Players.PlayerRemoving.Connect(disconnect)
 
 ipcServer.on('characterSelect', handleSelection).catch(promiseError)
 MasterClock.forceSync()
+
+RunService.Heartbeat.Connect((delta) => {
+  LagCompensation.update(delta)
+})

@@ -1,22 +1,18 @@
-import { ContextActionService, Players } from '@rbxts/services'
+import { ContextActionService } from '@rbxts/services'
 import { isClient, isServer, promiseError } from 'shared/utils'
 import { $print } from 'rbxts-transform-debug'
 import { ipcClient, ipcServer } from '@rbxts/abstractify'
 
 type ActionType = Enum.KeyCode | Enum.PlayerActions | Enum.UserInputType
 
-let LocalPlayer: Player, Mouse: PlayerMouse
-if (isClient()) {
-  LocalPlayer = Players.LocalPlayer
-  Mouse = LocalPlayer.GetMouse()
-}
-
 /**
  * A move that a character can do.
- */
+ *  */
 interface Move {
-  callback?: (state: Enum.UserInputState, inputObject: InputObject | undefined, hit: CFrame) => unknown
+  callback?: (data: any) => unknown
   cooldown?: number
+  /** Called on the client to assemble data to send over to the server. Whatever this returns will be  */
+  assemble: (state: Enum.UserInputState, inputObject: InputObject | undefined) => {}
   predicted: boolean
 }
 
@@ -40,7 +36,7 @@ export class Character {
   constructor (public player: Player) {
     // FIXME: there should really only be one connection, this wastes memory
     if (isServer()) {
-      ipcServer.on('moveInput', (player: Player, name: string, state, hit: CFrame) => {
+      ipcServer.on('moveInput', (player: Player, name: string, state: Enum.UserInputState, data) => {
         if (player === this.player) {
           if (this.getCooldown(name, state)) {
             $print(`Move with id: ${name} is on cooldown. Please wait!`)
@@ -48,13 +44,24 @@ export class Character {
           }
           let move: Move | undefined
           if ((move = this.moveMap.get(name)) !== undefined && move.callback !== undefined) {
-            move.callback(state, undefined, hit)
+            move.callback(data)
           }
         }
       })
         .then((connection) => {
           this.netMoveInput = connection
         }, promiseError)
+    }
+  }
+
+  /** Default assembler function for moves */
+  defaultAssemble: (state: Enum.UserInputState, inputObject: InputObject | undefined) => {
+    State: Enum.UserInputState
+    InputObject: InputObject | undefined
+  } = (state: Enum.UserInputState, inputObject: InputObject | undefined) => {
+    return {
+      State: state,
+      InputObject: inputObject
     }
   }
 
@@ -110,11 +117,12 @@ export class Character {
         $print(`Move with id: ${name} is on cooldown. Please wait!`)
         return
       }
-      ipcClient.emit('moveInput', name, state, Mouse.Hit).catch(promiseError)
+      const assembled = move.assemble(state, inputObject)
+      ipcClient.emit('moveInput', name, state, assembled).catch(promiseError)
       if (move.predicted) {
         $print('Predicting!')
         debug.profilebegin('NetPredict') // prediction profile
-        move.callback(state, inputObject, Mouse.Hit)
+        move.callback(assembled)
         debug.profileend()
       }
       return
@@ -149,7 +157,7 @@ export class Character {
    */
   createMove (...keyCodes: ActionType[]): Move {
     const id = tostring((this.moveId = this.moveId + 1))
-    const move: Move = { predicted: true } // predict all moves by default
+    const move: Move = { predicted: true, assemble: this.defaultAssemble } // predict all moves by default
     this.moveMap.set(id, move)
     if (isClient()) {
       ContextActionService.BindAction(id, (name, state, obj) => this.pollInputs(name, state, obj), false, ...keyCodes)

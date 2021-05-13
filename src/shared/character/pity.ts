@@ -45,19 +45,20 @@ export class PityCharacter extends Character {
     const primary = this.createMove(Enum.UserInputType.MouseButton1)
     primary.predicted = true
     primary.cooldown = 0.5
-    primary.callback = (state, _, hit) => this.primaryFire(state, hit)
+    primary.callback = (data) => this.primaryFire(data)
+    primary.assemble = (state) => { return { State: state, Hit: Players.LocalPlayer.GetMouse().Hit.Position } }
     if (isClient()) {
       Players.LocalPlayer.GetMouse().TargetFilter = ProjectileFolder
     }
   }
 
-  primaryFire (state: Enum.UserInputState, hit: CFrame): void {
-    if (state !== Enum.UserInputState.Begin) {
+  primaryFire (data: { State: Enum.UserInputState, Hit: Vector3 }): void {
+    if (data.State !== Enum.UserInputState.Begin) {
       return
     }
     const rootPart = this.character.WaitForChild('HumanoidRootPart') as BasePart
     const position = rootPart.Position.add(new Vector3(0, 0, 0))
-    fireReplicated(position, hit.Position.sub(position), this.player, CrossbowProjectile, this.character)
+    fireReplicated(position, data.Hit.sub(position), this.player, CrossbowProjectile, this.character)
   }
 
   onCharacterAdded (character: Model): void {
