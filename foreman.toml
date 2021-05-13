@@ -1,3 +1,3 @@
 [tools]
-rojo = { source = "roblox/rojo", version = "0.5.0" } # If using the Rojo 6 RC, update version to "6.0.0-rc.1"
+rojo = { source = "roblox/rojo", version = "6.1.0" } # If using the Rojo 6 RC, update version to "6.0.0-rc.1"
 run-in-roblox = { source = "rojo-rbx/run-in-roblox", version = "0.3.0" }
