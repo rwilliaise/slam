@@ -2,7 +2,7 @@
 /// <reference types="@rbxts/testez/globals" />
 
 export = () => {
-  describe('testing', () => {
+  describe('tests', () => {
     it('should work', () => {
       expect(true).to.equal(true)
     })
