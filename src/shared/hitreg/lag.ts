@@ -77,7 +77,7 @@ export function getSnapshots (time: number): SnapshotItem[] {
   let smallestItem: number | undefined
   const sortedStack = stack.sort((a, b) => a.markedTime < b.markedTime)
   // first, get the snapshot closest to the time given
-  for (let i = 0; i < sortedStack.size(); i++) {
+  for (let i = 0; i < sortedStack.size(); i = i + 1) {
     const item = sortedStack[i]
     if (math.abs(item.markedTime - time) < closestTime) {
       smallestItem = i

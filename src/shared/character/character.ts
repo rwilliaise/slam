@@ -148,7 +148,7 @@ export class Character {
    * @returns The move for editing
    */
   createMove (...keyCodes: ActionType[]): Move {
-    const id = tostring(this.moveId++)
+    const id = tostring((this.moveId = this.moveId + 1))
     const move: Move = { predicted: true } // predict all moves by default
     this.moveMap.set(id, move)
     if (isClient()) {
