@@ -21,17 +21,10 @@ jobs:
       with:
         submodules: true
 
-    - name: download roblox install script
-      run: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/OrbitalOwen/roblox-win-installer/master/install.py" -OutFile install.py
-
-    - name: download settings file
-      run: Invoke-WebRequest -Uri "https://raw.githubusercontent.com/OrbitalOwen/roblox-win-installer/master/GlobalSettings_13.xml" -OutFile GlobalSettings_13.xml
-
-    - name: install pip deps
-      run: pip install wget psutil
-
-    - name: install roblox
-      run: python install.py "${{ secrets.ROBLOSECURITY }}"
+    - uses: OrbitalOwen/roblox-win-installer-action@1.1
+      with:
+        cookie: ${{ secrets.ROBLOSECURITY }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: install npm packages
       uses: bahmutov/npm-install@v1
