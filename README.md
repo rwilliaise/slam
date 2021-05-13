@@ -2,7 +2,6 @@
 
 # SLAM
 [![CI](https://github.com/rwilliaise/slam/actions/workflows/ci.yml/badge.svg)](https://github.com/rwilliaise/slam/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/rwilliaise/slam/badge.svg?branch=master)](https://coveralls.io/github/rwilliaise/slam?branch=master)
 ![Discord](https://img.shields.io/discord/839895703379247114)
 ![GitHub](https://img.shields.io/github/license/rwilliaise/slam)
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/rwilliaise/slam)
