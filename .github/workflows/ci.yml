@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: install npm packages
-      run: Run bahmutov/npm-install@v1
+      uses: bahmutov/npm-install@v1
 
     - name: run standard
       run: npx ts-standard
@@ -25,7 +25,7 @@ jobs:
       uses: bahmutov/npm-install@v1
       
     - name: compile typescript code
-      run: rbxtsc --type=game
+      run: npx rbxtsc --type=game
 
     - uses: leafo/gh-actions-lua@v8
       with:
