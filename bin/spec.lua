@@ -27,8 +27,8 @@ local LOAD_MODULES = {
 -- Load all of the modules specified above
 for _, module in ipairs(LOAD_MODULES) do
 	local container = habitat:loadFromFs(module[1])
-	container.Name = module[2]
-	container.Parent = module[3]
+	container.Name = module[3]
+	container.Parent = module[2]
 end
 
 local include = habitat:loadFromFs("include")
