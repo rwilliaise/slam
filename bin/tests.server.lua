@@ -1,12 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptStorage = game:GetService("ServerScriptStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local isRobloxCli, ProcessService = pcall(game.GetService, game, "ProcessService")
 
 local TestEZ = require(ReplicatedStorage.include.node_modules.testez.src)
 
 local Roots = {
   ReplicatedStorage.TS,
-  ServerScriptStorage.TS,
+  ServerScriptService.TS,
 }
 local results = TestEZ.TestBootstrap:run(Roots, TestEZ.Reporters.TextReporter)
 
