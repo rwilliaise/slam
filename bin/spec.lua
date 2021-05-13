@@ -32,7 +32,7 @@ for _, module in ipairs(LOAD_MODULES) do
 end
 
 local include = habitat:loadFromFs("include")
-include.Name = "include"
+include.Name = "rbxts_include"
 include.Parent = ReplicatedStorage
 
 local modules = habitat:loadFromFs("node_modules/@rbxts")

@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local isRobloxCli, ProcessService = pcall(game.GetService, game, "ProcessService")
 
-local TestEZ = require(ReplicatedStorage.include.node_modules.testez.src)
+local TestEZ = require(ReplicatedStorage.rbxts_include.node_modules.testez.src)
 
 local Roots = {
   ReplicatedStorage.TS,
