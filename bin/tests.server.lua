@@ -7,7 +7,7 @@ local TestEZ = require(ReplicatedStorage.rbxts_include.node_modules.testez.src)
 local Roots = {
   ReplicatedStorage.TS,
   ServerScriptService.TS,
-  StarterPlayer.StarterPlayerScripts
+  StarterPlayer.StarterPlayerScripts.TS
 }
 local results = TestEZ.TestBootstrap:run(Roots, TestEZ.Reporters.TextReporter)
 

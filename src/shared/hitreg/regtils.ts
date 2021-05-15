@@ -5,24 +5,8 @@ export const LAG_COMP_MEMORY_SIZE = 15
 /** How many seconds between snapshots; in other words the resolution of lag compensation. Should be >=0.1 */
 export const LAG_COMP_RESOLUTION = 0.1
 
-export interface HitParams {
-  /** Instances that should be ignored/searched for. */
-  FilterDescendantsInstances?: Instance[]
-  /** Which filter type to use. */
-  FilterType?: Enum.RaycastFilterType
-}
-
-export enum HitType {
-  PROJECTILE,
-  MELEE
-}
-
-export interface HitDataPacket {
-  type: HitType
-  options: {
-    hit: Callback
-  }
-}
+/** How far up will melee attacks be (since there is no WorldRoot option for rr3) */
+export const MELEE_DISPLACEMENT = 1000
 
 export type Primitive =
         | null
